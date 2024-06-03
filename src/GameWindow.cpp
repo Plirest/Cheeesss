@@ -45,15 +45,15 @@ void GameWindow::promotePawn(ChessButton* button)
     // TODO: choose between any figure
     if (button->position.x() == 7)
     {
-        button->figure = new Queen(gridLayout, /*isBlack*/ true);
-        button->figure->position = button->position;
-        setButtonBackgroundImage(button, QString("../Design/Black/Queen%1.jpg").arg(ActiveBlack));
-    }
-    else if (button->position.x() == 0)
-    {
         button->figure = new Queen(gridLayout, /*isBlack*/ false);
         button->figure->position = button->position;
         setButtonBackgroundImage(button, QString("../Design/White/Queen%1.jpg").arg(ActiveWhite));
+    }
+    else if (button->position.x() == 0)
+    {
+        button->figure = new Queen(gridLayout, /*isBlack*/ true);
+        button->figure->position = button->position;
+        setButtonBackgroundImage(button, QString("../Design/Black/Queen%1.jpg").arg(ActiveBlack));
     }
 }
 
@@ -95,7 +95,7 @@ void GameWindow::removeInvalidSteps(QVector<QPoint>& possibleSteps, ChessButton*
             selectedButton->attack(attackedButton);
 
             // Check if move leads to check
-            bool leadsToCheck = checkShax(isBlackTurn);
+            bool leadsToCheck = checkShax(!isBlackTurn);
 
             // Revert the simulated turn
             attackedButton->attack(selectedButton);
@@ -134,11 +134,9 @@ bool GameWindow::checkShax(bool isBlackTurn)
         for (int col = 0; col < 8; ++col)
         {
             // if Blacks turn we find white figures
-            if (ChessButton* button = getButtonFromLayout(row, col); button->hasFigure() && button->figure->isBlack() != isBlackTurn)
+            if (ChessButton* button = getButtonFromLayout(row, col); button->hasFigure())// && button->figure->isBlack() != isBlackTurn)
             {
                 QVector<QPoint> possibleSteps = button->figure->getPossibleSteps();
-                // TODO: maybe use removeInvalidSteps?
-                // removeInvalidSteps(possibleSteps, button, isBlackTurn);
 
                 if (isBlackTurn && possibleSteps.contains(KingFirst->position)) return true;
                 if (!isBlackTurn && possibleSteps.contains(KingSecond->position)) return true;
@@ -187,10 +185,9 @@ void GameWindow::handleButtonClick()
             if (isKill) figuresBlack.removeOne(clickedButton);
         }
 
-        isBlackTurn = !isBlackTurn;
         if (checkShax(isBlackTurn))
         {
-            if (checkMat(isBlackTurn))
+            if (checkMat(!isBlackTurn))
             {
                 showNotification("SHAX AND MAT!");
             }
@@ -199,6 +196,8 @@ void GameWindow::handleButtonClick()
                 showNotification("SHAAAAAX!");
             }
         }
+
+        isBlackTurn = !isBlackTurn;
         return;
     }
 
@@ -349,32 +348,32 @@ void GameWindow::fillFigures()
     figuresWhite.push_back(secondBishopSecondPlayer);
 
     // Queen
-    ChessButton* QueenFirstPlayer = getButtonFromLayout(0, 4);
+    ChessButton* QueenFirstPlayer = getButtonFromLayout(0, 3);
     QueenFirstPlayer->figure = new Queen(gridLayout, /*isBlack*/ false);
-    QueenFirstPlayer->figure->position = {0, 4};
+    QueenFirstPlayer->figure->position = {0, 3};
     setButtonBackgroundImage(QueenFirstPlayer, QString("../Design/White/Queen%1.jpg").arg(ActiveWhite));
     QueenFirstPlayer->setIconSize(QueenFirstPlayer->size() - QSize(10, 10));
     figuresBlack.push_back(QueenFirstPlayer);
 
-    ChessButton* QueenSecondPlayer = getButtonFromLayout(7, 4);
+    ChessButton* QueenSecondPlayer = getButtonFromLayout(7, 3);
     QueenSecondPlayer->figure = new Queen(gridLayout, /*isBlack*/ true);
-    QueenSecondPlayer->figure->position = {7, 4};
+    QueenSecondPlayer->figure->position = {7, 3};
     setButtonBackgroundImage(QueenSecondPlayer, QString("../Design/Black/Queen%1.jpg").arg(ActiveBlack));
     QueenSecondPlayer->setIconSize(QueenSecondPlayer->size() - QSize(10, 10));
     figuresWhite.push_back(QueenSecondPlayer);
 
     // King
-    ChessButton* KingFirstPlayer = getButtonFromLayout(0, 3);
+    ChessButton* KingFirstPlayer = getButtonFromLayout(0, 4);
     KingFirstPlayer->figure = new King(gridLayout, /*isBlack*/ false);
-    KingFirstPlayer->figure->position = {0, 3};
+    KingFirstPlayer->figure->position = {0, 4};
     setButtonBackgroundImage(KingFirstPlayer, QString("../Design/White/Queen%1.jpg").arg(ActiveWhite));
     KingFirstPlayer->setIconSize(KingFirstPlayer->size() - QSize(10, 10));
     figuresBlack.push_back(KingFirstPlayer);
     KingFirst = KingFirstPlayer->figure;
 
-    ChessButton* KingSecondPlayer = getButtonFromLayout(7, 3);
+    ChessButton* KingSecondPlayer = getButtonFromLayout(7, 4);
     KingSecondPlayer->figure = new King(gridLayout, /*isBlack*/ true);
-    KingSecondPlayer->figure->position = {7, 3};
+    KingSecondPlayer->figure->position = {7, 4};
     setButtonBackgroundImage(KingSecondPlayer, QString("../Design/Black/Queen%1.jpg").arg(ActiveBlack));
     KingSecondPlayer->setIconSize(KingSecondPlayer->size() - QSize(10, 10));
     figuresWhite.push_back(KingSecondPlayer);
